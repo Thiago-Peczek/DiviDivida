@@ -3,28 +3,26 @@ import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 
 // ──────────────────────────────────────────────────────────
-// ⚠️  PLACEHOLDER CREDENTIALS
-// Replace these with the real values from your Supabase project.
-// You can find them at: https://supabase.com/dashboard → Settings → API
+// PARA QUEM FOR TESTAR: IMPORTANTE!
+// Credenciais carregadas do .env via prefixo EXPO_PUBLIC_ do Expo.
+// Crie um arquivo .env na raiz do projeto com:
+//   EXPO_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+//   EXPO_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key
 // ──────────────────────────────────────────────────────────
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
-/**
- * Custom storage adapter that uses expo-secure-store
- * so auth tokens are persisted securely on-device.
- */
-const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => SecureStore.getItemAsync(key),
-  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+const AdaptadorSecureStore = {
+  getItem: (chave: string) => SecureStore.getItemAsync(chave),
+  setItem: (chave: string, valor: string) => SecureStore.setItemAsync(chave, valor),
+  removeItem: (chave: string) => SecureStore.deleteItemAsync(chave),
 };
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: ExpoSecureStoreAdapter,
+    storage: AdaptadorSecureStore,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false, 
+    detectSessionInUrl: false,
   },
 });

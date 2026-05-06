@@ -63,13 +63,21 @@ export default function Cadastro() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require("../../assets/DiviDivida.png")}
+        style={styles.logo}
+      />
+      <Image
+        source={require("../../assets/DiviDividaLogo.png")}
+        style={styles.logoText}
+      />
       <Text style={styles.title}>Cadastro</Text>
 
       <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
         ) : (
-          <Text>Selecionar imagem</Text>
+          <Text style={styles.imageText}>Selecionar imagem</Text>
         )}
       </TouchableOpacity>
 
@@ -123,53 +131,71 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 24,
+    backgroundColor: "#a3c267",
   },
   imagePicker: {
     height: 120,
     width: 120,
     borderRadius: 60,
-    backgroundColor: "#eee",
+    backgroundColor: "#597317",
     alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
     overflow: "hidden",
   },
+  imageText: {
+    color: "#303329",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
   image: {
     width: "100%",
     height: "100%",
   },
+  logo: {
+    width: 300,
+    height: 80,
+    alignSelf: "center",
+  },
+  logoText: {
+    width: 300,
+    height: 150,
+    justifyContent: "center",
+    alignSelf: "center",
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#303329",
+    marginBottom: 24,
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#303329",
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
   },
   button: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#597317",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 8,
   },
   buttonText: {
-    color: "#fff",
+    color: "#303329",
     fontWeight: "bold",
   },
   link: {
     marginTop: 16,
     textAlign: "center",
-    color: "#007AFF",
+    color: "#35401A",
   },
   error: {
     color: "red",
     marginBottom: 8,
-    textAlign: "center",
   },
 });

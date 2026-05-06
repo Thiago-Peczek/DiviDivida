@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -39,42 +40,52 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Entrar</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+      <Image
+        source={require("../../assets/DiviDivida.png")}
+        style={styles.logo}
       />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+      <Image
+        source={require("../../assets/DiviDividaLogo.png")}
+        style={styles.logoText}
       />
+      <View>
+        <Text style={styles.title}>Entrar</Text>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Entrar</Text>
-        )}
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      <TouchableOpacity onPress={() => router.push("/cadastro")}>
-        <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
-      </TouchableOpacity>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Entrar</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/cadastro")}>
+          <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -84,34 +95,48 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
+    backgroundColor: "#a3c267",
+  },
+  logo: {
+    width: 300,
+    height: 80,
+    alignSelf: "center",
+  },
+  logoText: {
+    width: 300,
+    height: 150,
+    justifyContent: "center",
+    alignSelf: "center",
+    marginBottom: 24,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
+    color: "#303329",
     marginBottom: 24,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#303329",
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#597317",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 8,
   },
   buttonText: {
-    color: "#fff",
+    color: "#303329",
     fontWeight: "bold",
   },
   link: {
     marginTop: 16,
     textAlign: "center",
-    color: "#007AFF",
+    color: "#35401A",
   },
   error: {
     color: "red",

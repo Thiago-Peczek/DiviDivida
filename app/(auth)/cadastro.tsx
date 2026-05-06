@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Cadastro() {
-  const { login } = useAuth(); // mock: vamos usar login pra simular cadastro
+  const { register } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -51,8 +51,7 @@ export default function Cadastro() {
       setLoading(true);
       setError("");
 
-      // MOCK: usando login só pra simular fluxo
-      await login(email, password);
+      await register(name, email, password, image || undefined);
 
       router.replace("/");
     } catch (err: any) {

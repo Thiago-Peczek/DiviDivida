@@ -1,18 +1,16 @@
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-
-import { useState } from "react";
 
 function RootNavigator() {
   const { isLogged } = useAuth();
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       {isLogged ? (
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" />
       ) : (
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" />
       )}
     </Stack>
   );

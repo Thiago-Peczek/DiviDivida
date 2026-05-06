@@ -1,9 +1,22 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  aoMudarEstadoAuth,
+  cadastrar,
+  entrar,
+  obterSessao,
+  sair,
+} from "../services/authService";
 
 type AuthContextType = {
   isLogged: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  register: (
+    nome: string,
+    email: string,
+    password: string,
+    imagem?: string,
+  ) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -11,14 +24,39 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLogged, setIsLogged] = useState(false);
 
+  useEffect(() => {
+    obterSessao().then((session) => {
+      setIsLogged(!!session);
+    });
+
+    const { data: listener } = aoMudarEstadoAuth((_event, session) => {
+      setIsLogged(!!session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
   const login = async (email: string, password: string) => {
-    // aqui você pode ignorar os valores por enquanto
-    setIsLogged(true);
+    await entrar(email, password);
   };
-  const logout = () => setIsLogged(false);
+
+  const register = async (
+    nome: string,
+    email: string,
+    password: string,
+    imagem?: string,
+  ) => {
+    await cadastrar(nome, email, password, imagem);
+  };
+
+  const logout = async () => {
+    await sair();
+  };
 
   return (
-    <AuthContext.Provider value={{ isLogged, login, logout }}>
+    <AuthContext.Provider value={{ isLogged, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

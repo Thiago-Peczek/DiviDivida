@@ -20,7 +20,6 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    // validação básica
     if (!email || !password) {
       setError("Preencha todos os campos");
       return;
@@ -31,9 +30,6 @@ export default function Login() {
       setError("");
 
       await login(email, password);
-
-      // navegação (opcional, mas ajuda)
-      router.replace("/");
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login");
     } finally {

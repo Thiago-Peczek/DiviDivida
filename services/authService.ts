@@ -23,6 +23,7 @@ export async function cadastrar(
   const { error: dbError } = await supabase.from("usuarios").insert({
     id: user.id,
     nome,
+    email,
     imagem_url: imagem_url || null,
   });
 

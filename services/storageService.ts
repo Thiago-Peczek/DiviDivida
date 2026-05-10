@@ -30,3 +30,32 @@ export function obterUrlAvatar(usuarioId: string): string {
 
   return data.publicUrl;
 }
+
+const BUCKET_RECIBOS = 'recibos';
+
+export async function enviarRecibo(
+  grupoId: string,
+  usuarioId: string,
+  uriArquivo: string,
+): Promise<string> {
+  const resposta = await fetch(uriArquivo);
+  const blob = await resposta.blob();
+
+  const nomeArquivo = `${grupoId}/${usuarioId}_${Date.now()}.jpg`;
+
+  const { error } = await supabase.storage
+    .from(BUCKET_RECIBOS)
+    .upload(nomeArquivo, blob, {
+      contentType: 'image/jpeg',
+      upsert: false,
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from(BUCKET_RECIBOS)
+    .getPublicUrl(nomeArquivo);
+
+  return data.publicUrl;
+}
+

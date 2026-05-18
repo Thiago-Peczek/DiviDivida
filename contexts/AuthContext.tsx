@@ -6,9 +6,14 @@ import {
   obterSessao,
   sair,
 } from "../services/authService";
+import { obterPerfil } from "../services/userService";
+import type { Usuario } from "../types/database";
 
 type AuthContextType = {
   isLogged: boolean;
+  isLoading: boolean;
+  userId: string | null;
+  profile: Usuario | null;
   login: (email: string, password: string) => Promise<void>;
   register: (
     nome: string,
@@ -17,20 +22,44 @@ type AuthContextType = {
     imagem?: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLogged, setIsLogged] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Usuario | null>(null);
+
+  const loadProfile = async (uid: string) => {
+    try {
+      const p = await obterPerfil(uid);
+      setProfile(p);
+    } catch {
+      setProfile(null);
+    }
+  };
 
   useEffect(() => {
-    obterSessao().then((session) => {
+    obterSessao().then(async (session) => {
       setIsLogged(!!session);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      if (uid) await loadProfile(uid);
+      setIsLoading(false);
     });
 
-    const { data: listener } = aoMudarEstadoAuth((_event, session) => {
+    const { data: listener } = aoMudarEstadoAuth(async (_event, session) => {
       setIsLogged(!!session);
+      const uid = session?.user?.id ?? null;
+      setUserId(uid);
+      if (uid) {
+        await loadProfile(uid);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => {
@@ -53,10 +82,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     await sair();
+    setProfile(null);
+    setUserId(null);
+  };
+
+  const refreshProfile = async () => {
+    if (userId) await loadProfile(userId);
   };
 
   return (
-    <AuthContext.Provider value={{ isLogged, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        isLogged,
+        isLoading,
+        userId,
+        profile,
+        login,
+        register,
+        logout,
+        refreshProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

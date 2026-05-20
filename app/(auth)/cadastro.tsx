@@ -52,8 +52,7 @@ export default function Cadastro() {
       setError("");
 
       await register(name, email, password, image || undefined);
-
-      router.replace("/");
+      router.push("/login");
     } catch (err: any) {
       setError(err.message || "Erro ao cadastrar");
     } finally {

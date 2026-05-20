@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -39,63 +40,72 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/DiviDivida.png")}
-        style={styles.logo}
-      />
-      <Image
-        source={require("../../assets/DiviDividaLogo.png")}
-        style={styles.logoText}
-      />
-      <View>
-        <Text style={styles.title}>Entrar</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
+    <ScrollView
+      contentContainerStyle={styles.scroll}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/DiviDivida.png")}
+          style={styles.logo}
         />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+        <Image
+          source={require("../../assets/DiviDividaLogo.png")}
+          style={styles.logoText}
         />
+        <View>
+          <Text style={styles.title}>Entrar</Text>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Entrar</Text>
-          )}
-        </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <TouchableOpacity onPress={() => router.push("/cadastro")}>
-          <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
-        </TouchableOpacity>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Entrar</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.push("/cadastro")}>
+            <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    paddingTop: 80,
     padding: 20,
     backgroundColor: "#a3c267",
+  },
+  scroll: {
+    flexGrow: 1,
   },
   logo: {
     width: 300,

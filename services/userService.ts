@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase';
-import type { Usuario } from '@/types/database';
+import { supabase } from "@/lib/supabase";
+import type { Usuario } from "@/types/database";
 
 export async function criarPerfil(
   id: string,
@@ -8,7 +8,7 @@ export async function criarPerfil(
   imagemUrl?: string | null,
 ): Promise<Usuario> {
   const { data, error } = await supabase
-    .from('usuarios')
+    .from("usuarios")
     .insert({
       id,
       nome,
@@ -24,14 +24,14 @@ export async function criarPerfil(
 
 export async function obterPerfil(id: string): Promise<Usuario | null> {
   const { data, error } = await supabase
-    .from('usuarios')
-    .select('*')
-    .eq('id', id)
+    .from("usuarios")
+    .select("*")
+    .eq("id", id)
     .single();
 
   if (error) {
     // PGRST116 = nenhuma linha retornada — perfil ainda nao existe
-    if (error.code === 'PGRST116') return null;
+    if (error.code === "PGRST116") return null;
     throw error;
   }
   return data as Usuario;
@@ -39,12 +39,12 @@ export async function obterPerfil(id: string): Promise<Usuario | null> {
 
 export async function atualizarPerfil(
   id: string,
-  campos: Partial<Pick<Usuario, 'nome' | 'email' | 'imagem_url'>>,
+  campos: Partial<Pick<Usuario, "nome" | "imagem_url">>,
 ): Promise<Usuario> {
   const { data, error } = await supabase
-    .from('usuarios')
+    .from("usuarios")
     .update(campos)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 

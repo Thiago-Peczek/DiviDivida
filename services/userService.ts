@@ -39,7 +39,7 @@ export async function obterPerfil(id: string): Promise<Usuario | null> {
 
 export async function atualizarPerfil(
   id: string,
-  campos: Partial<Pick<Usuario, 'nome' | 'email' | 'imagem_url'>>,
+  campos: Partial<Pick<Usuario, 'nome' | 'imagem_url'>>,
 ): Promise<Usuario> {
   const { data, error } = await supabase
     .from('usuarios')

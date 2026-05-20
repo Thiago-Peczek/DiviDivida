@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { router } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -11,6 +12,7 @@ import {
 
 import { useAuth } from "@/contexts/AuthContext";
 import { listarMeusGrupos } from "@/services/grupoService";
+import { useFocusEffect } from "@react-navigation/native";
 
 import GroupCard from "../../components/groupCard";
 
@@ -24,24 +26,30 @@ export default function GroupsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (userId) {
-      carregarGrupos();
-    } else {
-      setLoading(false);
-    }
-  }, [userId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        carregarGrupos();
+      } else {
+        setLoading(false);
+      }
+    }, [userId]),
+  );
 
   const carregarGrupos = async () => {
     try {
-      setLoading(true);
-      setError("");
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
-      const data = await listarMeusGrupos(userId!);
+      setLoading(true);
+
+      const data = await listarMeusGrupos(userId);
 
       setGroups(data);
-    } catch (err: any) {
-      setError(err.message || "Erro ao carregar grupos");
+    } catch (err) {
+      console.log("ERRO:", err);
     } finally {
       setLoading(false);
     }
@@ -83,14 +91,20 @@ export default function GroupsScreen() {
             <Text style={styles.empty}>
               Você ainda não participa de nenhum grupo
             </Text>
-            <TouchableOpacity style={styles.buttonEmpty}>
+            <TouchableOpacity
+              style={styles.buttonEmpty}
+              onPress={() => router.push("../group/create")}
+            >
               <Text style={styles.buttonText}>Crie um Grupo</Text>
             </TouchableOpacity>
           </View>
         }
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push("../group/create")}
+      >
         <Text style={styles.buttonText}>+ Novo Grupo</Text>
       </TouchableOpacity>
       <Button title="Sair" onPress={logout} />
@@ -105,6 +119,7 @@ const styles = StyleSheet.create({
   },
 
   list: {
+    paddingTop: 40,
     padding: 20,
     paddingBottom: 120,
   },

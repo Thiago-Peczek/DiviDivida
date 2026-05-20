@@ -4,6 +4,8 @@ import type { Grupo } from "@/types/database";
 export async function criarGrupo(
   nome: string,
   criadorId: string,
+  latitude?: number | null,
+  longitude?: number | null,
   imagemGrupoUrl?: string | null,
 ): Promise<Grupo> {
   const { data: grupo, error: erroGrupo } = await supabase
@@ -11,6 +13,8 @@ export async function criarGrupo(
     .insert({
       nome,
       criado_por_usuario_id: criadorId,
+      encontro_latitude: latitude ?? null,
+      encontro_longitude: longitude ?? null,
       imagem_grupo_url: imagemGrupoUrl ?? null,
     })
     .select()
@@ -23,7 +27,6 @@ export async function criarGrupo(
     .insert({ grupo_id: (grupo as Grupo).id, usuario_id: criadorId });
 
   if (erroMembro) throw erroMembro;
-
   return grupo as Grupo;
 }
 

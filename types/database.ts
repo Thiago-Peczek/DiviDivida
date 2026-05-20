@@ -1,7 +1,6 @@
 export type Usuario = {
   id: string;
   nome: string;
-  email: string;
   imagem_url: string | null;
   criado_em: string;
 };

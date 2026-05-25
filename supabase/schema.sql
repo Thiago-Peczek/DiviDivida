@@ -13,6 +13,7 @@ create table if not exists public.grupos (
   nome text not null,
   encontro_latitude double precision,
   encontro_longitude double precision,
+  encontro_nome text,
   imagem_grupo_url text,
   criado_em timestamptz not null default now()
 );

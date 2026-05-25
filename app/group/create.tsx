@@ -21,6 +21,7 @@ export default function CreateGroupScreen() {
   const [imagem, setImagem] = useState<string | null>(null);
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
+  const [locationName, setLocationName] = useState("");
   const [error, setError] = useState("");
 
   const { userId } = useAuth();
@@ -69,7 +70,7 @@ export default function CreateGroupScreen() {
         return;
       }
 
-      await criarGrupo(nome, userId, latitude, longitude, imagem);
+      await criarGrupo(nome, userId, latitude, longitude, locationName, imagem);
 
       Alert.alert("Sucesso", "Grupo criado com sucesso");
 
@@ -97,6 +98,12 @@ export default function CreateGroupScreen() {
       />
 
       <Text style={styles.mapLabel}>Selecione o local do encontro</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do local"
+        value={locationName}
+        onChangeText={setLocationName}
+      />
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}

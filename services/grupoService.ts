@@ -6,6 +6,7 @@ export async function criarGrupo(
   criadorId: string,
   latitude?: number | null,
   longitude?: number | null,
+  encontroNome?: string | null,
   imagemGrupoUrl?: string | null,
 ): Promise<Grupo> {
   const { data: grupo, error: erroGrupo } = await supabase
@@ -15,6 +16,7 @@ export async function criarGrupo(
       criado_por_usuario_id: criadorId,
       encontro_latitude: latitude ?? null,
       encontro_longitude: longitude ?? null,
+      encontro_nome: encontroNome ?? null,
       imagem_grupo_url: imagemGrupoUrl ?? null,
     })
     .select()

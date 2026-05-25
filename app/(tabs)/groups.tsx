@@ -82,7 +82,12 @@ export default function GroupsScreen() {
             nome={item.nome}
             imagem={item.imagem_grupo_url ?? ""}
             onPress={() => {
-              console.log(item.id);
+              router.push({
+                pathname: "../group/[id]",
+                params: {
+                  id: item.id,
+                },
+              });
             }}
           />
         )}

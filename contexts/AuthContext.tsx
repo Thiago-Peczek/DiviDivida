@@ -37,7 +37,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const p = await obterPerfil(uid);
       setProfile(p);
-    } catch {
+    } catch (err) {
+      console.error("Erro ao carregar perfil:", err);
       setProfile(null);
     }
   };
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    await entrar(email, password);
+    const data = await entrar(email, password);
   };
 
   const register = async (
@@ -82,8 +83,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     await sair();
-    setProfile(null);
-    setUserId(null);
   };
 
   const refreshProfile = async () => {

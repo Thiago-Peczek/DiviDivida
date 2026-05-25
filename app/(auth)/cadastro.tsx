@@ -32,8 +32,10 @@ export default function Cadastro() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -52,8 +54,7 @@ export default function Cadastro() {
       setError("");
 
       await register(name, email, password, image || undefined);
-
-      router.replace("/");
+      router.push("/login");
     } catch (err: any) {
       setError(err.message || "Erro ao cadastrar");
     } finally {

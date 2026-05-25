@@ -11,6 +11,7 @@ export type Grupo = {
   nome: string;
   encontro_latitude: number | null;
   encontro_longitude: number | null;
+  encontro_nome?: string | null;
   imagem_grupo_url: string | null;
   criado_em: string;
 };

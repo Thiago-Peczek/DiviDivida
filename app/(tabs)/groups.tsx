@@ -242,6 +242,11 @@ const styles = StyleSheet.create({
 
     elevation: 4,
   },
+  buttonText: {
+    color: "#303329",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 
   error: {
     color: "red",

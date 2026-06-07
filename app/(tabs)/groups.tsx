@@ -14,6 +14,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { listarMeusGrupos } from "@/services/grupoService";
 import { useFocusEffect } from "@react-navigation/native";
 
+import { Ionicons } from "@expo/vector-icons";
+
 import GroupCard from "../../components/groupCard";
 
 import type { Grupo } from "@/types/database";
@@ -25,6 +27,7 @@ export default function GroupsScreen() {
   const [groups, setGroups] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -106,12 +109,44 @@ export default function GroupsScreen() {
         }
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push("../group/create")}
-      >
-        <Text style={styles.buttonText}>+ Novo Grupo</Text>
-      </TouchableOpacity>
+      <View style={styles.fabContainer}>
+        {menuOpen && (
+          <>
+            <TouchableOpacity
+              style={styles.fabOption}
+              onPress={() => {
+                setMenuOpen(false);
+                router.push("../group/create");
+              }}
+            >
+              <Ionicons name="add" size={20} color="#303329" />
+              <Text style={styles.fabOptionText}>Novo Grupo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.fabOption}
+              onPress={() => {
+                setMenuOpen(false);
+                router.push("/group/join-group");
+              }}
+            >
+              <Ionicons name="enter-outline" size={20} color="#303329" />
+              <Text style={styles.fabOptionText}>Entrar em Grupo</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => setMenuOpen(!menuOpen)}
+        >
+          <Ionicons
+            name={menuOpen ? "close" : "add"}
+            size={28}
+            color="#303329"
+          />
+        </TouchableOpacity>
+      </View>
       <Button title="Sair" onPress={logout} />
     </View>
   );
@@ -148,23 +183,52 @@ const styles = StyleSheet.create({
     color: "#303329",
     fontWeight: "600",
   },
-
-  button: {
+  fabContainer: {
     position: "absolute",
-    bottom: 24,
     right: 24,
+    bottom: 24,
+    alignItems: "flex-end",
+  },
+
+  fab: {
+    width: 64,
+    height: 64,
+
+    borderRadius: 32,
 
     backgroundColor: "#597317",
 
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-
-    borderRadius: 999,
-
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+
+    elevation: 6,
+  },
+
+  fabOption: {
+    flexDirection: "row",
+    alignItems: "center",
+
+    backgroundColor: "#D7E4B3",
+
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+
+    borderRadius: 16,
+
+    marginBottom: 12,
+
+    borderWidth: 1,
+    borderColor: "#597317",
 
     elevation: 4,
+  },
+
+  fabOptionText: {
+    marginLeft: 8,
+
+    color: "#303329",
+    fontWeight: "bold",
+    fontSize: 15,
   },
   buttonEmpty: {
     backgroundColor: "#597317",

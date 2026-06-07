@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { enviarAvatar } from "./storageService";
 
 export async function cadastrar(
   nome: string,
@@ -20,10 +21,16 @@ export async function cadastrar(
     throw new Error("Usuário não foi criado");
   }
 
+  let imagemUrl: string | null = null;
+
+  if (imagem_url) {
+    imagemUrl = await enviarAvatar(user.id, imagem_url);
+  }
+
   const { error: dbError } = await supabase.from("usuarios").insert({
     id: user.id,
     nome,
-    imagem_url: imagem_url || null,
+    imagem_url: imagemUrl,
   });
 
   if (dbError) throw dbError;

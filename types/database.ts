@@ -14,6 +14,7 @@ export type Grupo = {
   encontro_nome?: string | null;
   imagem_grupo_url: string | null;
   criado_em: string;
+  codigo_convite: string;
 };
 
 export type MembroGrupo = {

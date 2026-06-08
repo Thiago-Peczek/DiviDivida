@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   FlatList,
   StyleSheet,
   Text,
@@ -22,7 +21,6 @@ import type { Grupo } from "@/types/database";
 
 export default function GroupsScreen() {
   const { userId } = useAuth();
-  const { logout } = useAuth();
 
   const [groups, setGroups] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,7 +145,6 @@ export default function GroupsScreen() {
           />
         </TouchableOpacity>
       </View>
-      <Button title="Sair" onPress={logout} />
     </View>
   );
 }

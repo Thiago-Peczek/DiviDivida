@@ -87,7 +87,7 @@ export default function Login() {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push("/cadastro")}>
+          <TouchableOpacity onPress={() => router.push("/(auth)/cadastro")}>
             <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
           </TouchableOpacity>
         </View>

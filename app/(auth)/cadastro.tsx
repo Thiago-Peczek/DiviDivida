@@ -54,7 +54,7 @@ export default function Cadastro() {
       setError("");
 
       await register(name, email, password, image || undefined);
-      router.push("/login");
+      router.replace("/(auth)/login");
     } catch (err: any) {
       setError(err.message || "Erro ao cadastrar");
     } finally {
@@ -120,7 +120,7 @@ export default function Cadastro() {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/login")}>
+      <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
         <Text style={styles.link}>Já tem conta? Entrar</Text>
       </TouchableOpacity>
     </View>

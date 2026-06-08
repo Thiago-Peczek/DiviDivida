@@ -19,8 +19,8 @@ export default function CreateGroupMap({
     onPress({
       nativeEvent: {
         coordinate: {
-          latitude: -25.4295963 + (Math.random() - 0.5) * 0.01,
-          longitude: -49.2712724 + (Math.random() - 0.5) * 0.01,
+          latitude: -25.4633 + (Math.random() - 0.5) * 0.01,
+          longitude: -49.2353 + (Math.random() - 0.5) * 0.01,
         },
       },
     });

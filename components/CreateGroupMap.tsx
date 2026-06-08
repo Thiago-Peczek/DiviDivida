@@ -19,8 +19,8 @@ export default function CreateGroupMap({
       style={style}
       onPress={onPress}
       initialRegion={{
-        latitude: -25.4295963,
-        longitude: -49.2712724,
+        latitude: -25.4633,
+        longitude: -49.2353,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       }}

@@ -86,7 +86,7 @@ export default function GroupsScreen() {
             imagem={item.imagem_grupo_url ?? ""}
             onPress={() => {
               router.push({
-                pathname: "../group/[id]",
+                pathname: "../grupo/[id]",
                 params: {
                   id: item.id,
                 },
@@ -101,7 +101,7 @@ export default function GroupsScreen() {
             </Text>
             <TouchableOpacity
               style={styles.buttonEmpty}
-              onPress={() => router.push("../group/create")}
+              onPress={() => router.push("../grupo/create")}
             >
               <Text style={styles.buttonText}>Crie um Grupo</Text>
             </TouchableOpacity>
@@ -116,7 +116,7 @@ export default function GroupsScreen() {
               style={styles.fabOption}
               onPress={() => {
                 setMenuOpen(false);
-                router.push("../group/create");
+                router.push("../grupo/create");
               }}
             >
               <Ionicons name="add" size={20} color="#303329" />
@@ -127,7 +127,7 @@ export default function GroupsScreen() {
               style={styles.fabOption}
               onPress={() => {
                 setMenuOpen(false);
-                router.push("/group/join-group");
+                router.push("/grupo/join-group" as any);
               }}
             >
               <Ionicons name="enter-outline" size={20} color="#303329" />

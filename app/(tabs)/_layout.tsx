@@ -28,11 +28,20 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="groups"
+        name="grupos"
         options={{
           title: "Grupos",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="atividade"
+        options={{
+          title: "Atividade",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="time-outline" color={color} size={size} />
           ),
         }}
       />
@@ -42,6 +51,15 @@ export default function TabLayout() {
           title: "Extrato",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="receipt-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="perfil"
+        options={{
+          title: "Perfil",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" color={color} size={size} />
           ),
         }}
       />

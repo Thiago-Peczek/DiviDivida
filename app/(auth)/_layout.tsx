@@ -10,7 +10,7 @@ export default function AuthLayout() {
   }
 
   if (isLogged) {
-    return <Redirect href="/(tabs)/groups" />;
+    return <Redirect href={"/(tabs)/grupos" as any} />;
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;

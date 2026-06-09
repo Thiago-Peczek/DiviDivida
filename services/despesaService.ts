@@ -87,22 +87,15 @@ export type Saldo = {
   balanco: number; // positivo = pagou a mais, negativo = deve
 };
 
-export type Transferencia = {
-  deUsuarioId: string;
-  paraUsuarioId: string;
-  valor: number;
-};
-
 /**
  * Calcula o balanco financeiro de um grupo.
- * Retorna o saldo individual de cada membro e a lista simplificada
- * de transferencias necessarias para quitar todas as dividas.
+ * Retorna o saldo individual de cada membro.
  */
 export function calcularBalanco(
   despesas: Despesa[],
   membrosIds: string[],
-): { saldos: Saldo[]; transferencias: Transferencia[] } {
-  if (membrosIds.length === 0) return { saldos: [], transferencias: [] };
+): { saldos: Saldo[] } {
+  if (membrosIds.length === 0) return { saldos: [] };
 
   // Total gasto no grupo
   const totalGeral = despesas.reduce(
@@ -126,41 +119,5 @@ export function calcularBalanco(
     balanco: pagoPor[id] - cotaJusta,
   }));
 
-  // Algoritmo ganancioso para simplificar transferencias
-  const devedores: { id: string; valor: number }[] = [];
-  const credores: { id: string; valor: number }[] = [];
-
-  for (const s of saldos) {
-    if (s.balanco < -0.01)
-      devedores.push({ id: s.usuarioId, valor: -s.balanco });
-    if (s.balanco > 0.01) credores.push({ id: s.usuarioId, valor: s.balanco });
-  }
-
-  // Ordena do maior para o menor para minimizar numero de transferencias
-  devedores.sort((a, b) => b.valor - a.valor);
-  credores.sort((a, b) => b.valor - a.valor);
-
-  const transferencias: Transferencia[] = [];
-  let i = 0;
-  let j = 0;
-
-  while (i < devedores.length && j < credores.length) {
-    const valor = Math.min(devedores[i].valor, credores[j].valor);
-
-    if (valor > 0.01) {
-      transferencias.push({
-        deUsuarioId: devedores[i].id,
-        paraUsuarioId: credores[j].id,
-        valor: Math.round(valor * 100) / 100,
-      });
-    }
-
-    devedores[i].valor -= valor;
-    credores[j].valor -= valor;
-
-    if (devedores[i].valor < 0.01) i++;
-    if (credores[j].valor < 0.01) j++;
-  }
-
-  return { saldos, transferencias };
+  return { saldos };
 }

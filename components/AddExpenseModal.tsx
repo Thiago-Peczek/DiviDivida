@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
   StyleSheet,
   Text,
@@ -43,7 +44,7 @@ export default function ExpenseModal({
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissao.granted) {
-      alert("Permissão necessária");
+      alert("PermissÃ£o necessÃ¡ria");
       return;
     }
 
@@ -57,6 +58,7 @@ export default function ExpenseModal({
       setImagem(result.assets[0].uri);
     }
   };
+
   const handleCreateExpense = async () => {
     try {
       setSaving(true);
@@ -89,56 +91,58 @@ export default function ExpenseModal({
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Nova Despesa</Text>
+        <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingView}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Nova Despesa</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Descrição"
-            value={descricao}
-            onChangeText={setDescricao}
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="DescriÃ§Ã£o"
+              value={descricao}
+              onChangeText={setDescricao}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Valor"
-            keyboardType="numeric"
-            value={valor}
-            onChangeText={setValor}
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Valor"
+              keyboardType="numeric"
+              value={valor}
+              onChangeText={setValor}
+            />
 
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={escolherImagem}
-            disabled={saving}
-          >
-            {imagem ? (
-              <Image source={{ uri: imagem }} style={styles.preview} />
-            ) : (
-              <Text style={styles.imageButtonText}>Selecionar recibo</Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={escolherImagem}
+              disabled={saving}
+            >
+              {imagem ? (
+                <Image source={{ uri: imagem }} style={styles.preview} />
+              ) : (
+                <Text style={styles.imageButtonText}>Selecionar recibo</Text>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleCreateExpense}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="#303329" />
-            ) : (
-              <Text style={styles.buttonText}>Salvar</Text>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleCreateExpense}
+              disabled={saving}
+            >
+              {saving ? (
+                <ActivityIndicator color="#303329" />
+              ) : (
+                <Text style={styles.buttonText}>Salvar</Text>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={onClose}
-            disabled={saving}
-          >
-            <Text style={styles.cancelText}>Cancelar</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={onClose}
+              disabled={saving}
+            >
+              <Text style={styles.cancelText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
       </View>
 
       <Modal visible={saving} transparent animationType="fade">
@@ -161,6 +165,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  keyboardAvoidingView: {
+    justifyContent: "flex-end",
   },
   loadingOverlay: {
     flex: 1,

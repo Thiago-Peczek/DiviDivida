@@ -4,17 +4,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { criarGrupo } from "@/services/grupoService";
 import { router } from "expo-router";
 
+import CreateGroupMap from "@/components/CreateGroupMap";
 import * as ImagePicker from "expo-image-picker";
 import {
+  ActivityIndicator,
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import CreateGroupMap from "@/components/CreateGroupMap";
 
 export default function CreateGroupScreen() {
   const [nome, setNome] = useState("");
@@ -23,6 +25,7 @@ export default function CreateGroupScreen() {
   const [longitude, setLongitude] = useState<number | null>(null);
   const [locationName, setLocationName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { userId } = useAuth();
 
@@ -70,52 +73,98 @@ export default function CreateGroupScreen() {
         return;
       }
 
-      await criarGrupo(nome, userId, latitude, longitude, locationName, imagem);
+      setLoading(true);
+
+      await criarGrupo(
+        nome.trim(),
+        userId,
+        latitude,
+        longitude,
+        locationName.trim() || null,
+        imagem,
+      );
 
       Alert.alert("Sucesso", "Grupo criado com sucesso");
 
       router.back();
     } catch (err: any) {
       Alert.alert("Erro", err.message || "Erro ao criar grupo");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
-        {imagem ? (
-          <Image source={{ uri: imagem }} style={styles.image} />
-        ) : (
-          <Text style={styles.imageText}>Selecionar imagem</Text>
-        )}
-      </TouchableOpacity>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity
+          style={styles.imagePicker}
+          onPress={handlePickImage}
+          disabled={loading}
+        >
+          {imagem ? (
+            <Image source={{ uri: imagem }} style={styles.image} />
+          ) : (
+            <Text style={styles.imageText}>Selecionar imagem</Text>
+          )}
+        </TouchableOpacity>
 
-      <TextInput
-        placeholder="Nome do grupo"
-        value={nome}
-        onChangeText={setNome}
-        style={styles.input}
-      />
-
-      <Text style={styles.mapLabel}>Selecione o local do encontro</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do local"
-        value={locationName}
-        onChangeText={setLocationName}
-      />
-      <View style={styles.mapContainer}>
-        <CreateGroupMap
-          style={styles.map}
-          onPress={selecionarLocal}
-          latitude={latitude}
-          longitude={longitude}
+        <TextInput
+          placeholder="Nome do grupo"
+          value={nome}
+          onChangeText={setNome}
+          style={styles.input}
+          editable={!loading}
         />
-      </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleCriarGrupo}>
-        <Text style={styles.buttonText}>Criar Grupo</Text>
-      </TouchableOpacity>
+        <Text style={styles.mapLabel}>Selecione o local do encontro</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Nome do local"
+          value={locationName}
+          onChangeText={setLocationName}
+          editable={!loading}
+        />
+
+        <View style={styles.mapContainer}>
+          <CreateGroupMap
+            style={styles.map}
+            onPress={(event) => {
+              if (!loading) {
+                selecionarLocal(event);
+              }
+            }}
+            latitude={latitude}
+            longitude={longitude}
+          />
+        </View>
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleCriarGrupo}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#303329" />
+          ) : (
+            <Text style={styles.buttonText}>Criar Grupo</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => router.back()}
+          disabled={loading}
+        >
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
@@ -124,7 +173,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#a3c267",
+  },
+  content: {
     padding: 20,
+    paddingBottom: 40,
+  },
+
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+
+  cancelButton: {
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+
+    borderWidth: 1,
+    borderColor: "#35401A",
+  },
+
+  cancelButtonText: {
+    color: "#35401A",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  error: {
+    color: "#B00020",
+    marginBottom: 12,
+    textAlign: "center",
+    fontWeight: "bold",
   },
 
   imagePicker: {
@@ -137,7 +216,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     overflow: "hidden",
     marginBottom: 24,
-    marginTop: 40,
+    marginTop: 20,
   },
 
   imageText: {

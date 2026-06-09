@@ -20,20 +20,22 @@ import { listarMeusGrupos } from '@/services/grupoService';
 import { listarMembros, type MembroComPerfil } from '@/services/membroService';
 import type { Grupo } from '@/types/database';
 
-const formatadorMoeda = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-});
-
-const formatadorData = new Intl.DateTimeFormat('pt-BR', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
 const LIMITE_BALANCO = 0.01;
+
+function formatarMoeda(valor: number) {
+  return `R$ ${valor.toFixed(2).replace('.', ',')}`;
+}
+
+function formatarData(dataIso: string) {
+  const data = new Date(dataIso);
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const ano = data.getFullYear();
+  const hora = String(data.getHours()).padStart(2, '0');
+  const minuto = String(data.getMinutes()).padStart(2, '0');
+
+  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+}
 
 type SaldoApresentacao = {
   usuarioId: string;
@@ -42,14 +44,6 @@ type SaldoApresentacao = {
   totalPago: number;
   cotaJusta: number;
   balanco: number;
-};
-
-type TransferenciaApresentacao = {
-  deUsuarioId: string;
-  deNome: string;
-  paraUsuarioId: string;
-  paraNome: string;
-  valor: number;
 };
 
 export default function ExtratoScreen() {
@@ -111,14 +105,6 @@ export default function ExtratoScreen() {
       }))
       .sort((a, b) => b.balanco - a.balanco);
   }, [membrosPorId, resultadoBalanco.saldos]);
-
-  const transferenciasApresentacao = useMemo<TransferenciaApresentacao[]>(() => {
-    return resultadoBalanco.transferencias.map((transferencia) => ({
-      ...transferencia,
-      deNome: membrosPorId.get(transferencia.deUsuarioId)?.nome ?? 'Participante',
-      paraNome: membrosPorId.get(transferencia.paraUsuarioId)?.nome ?? 'Participante',
-    }));
-  }, [membrosPorId, resultadoBalanco.transferencias]);
 
   const totaisPorPagador = useMemo(() => {
     const mapa = new Map<string, { nome: string; total: number }>();
@@ -216,7 +202,7 @@ export default function ExtratoScreen() {
 
   const abrirTelaDoGrupo = (grupoId: string) => {
     router.push({
-      pathname: '/group/[id]',
+      pathname: '/grupo/[id]',
       params: { id: grupoId },
     });
   };
@@ -224,9 +210,8 @@ export default function ExtratoScreen() {
   const textoSaldoUsuario = useMemo(() => {
     if (!saldoDoUsuario) {
       return {
-        titulo: 'Sua posicao',
-        valor: 'Sem dados ainda',
-        detalhe: 'Entre nas despesas do grupo para comecar a fechar as contas.',
+        titulo: 'Seu saldo neste grupo',
+        valor: formatarMoeda(0),
         destaque: styles.neutroValor,
       };
     }
@@ -234,8 +219,7 @@ export default function ExtratoScreen() {
     if (saldoDoUsuario.balanco > LIMITE_BALANCO) {
       return {
         titulo: 'Seu saldo neste grupo',
-        valor: formatadorMoeda.format(saldoDoUsuario.balanco),
-        detalhe: 'Voce pagou mais do que sua parte e tem valor para receber.',
+        valor: formatarMoeda(saldoDoUsuario.balanco),
         destaque: styles.positivoValor,
       };
     }
@@ -243,16 +227,14 @@ export default function ExtratoScreen() {
     if (saldoDoUsuario.balanco < -LIMITE_BALANCO) {
       return {
         titulo: 'Seu saldo neste grupo',
-        valor: formatadorMoeda.format(Math.abs(saldoDoUsuario.balanco)),
-        detalhe: 'Esse e o valor pendente para voce acertar neste grupo.',
+        valor: formatarMoeda(Math.abs(saldoDoUsuario.balanco)),
         destaque: styles.negativoValor,
       };
     }
 
     return {
       titulo: 'Seu saldo neste grupo',
-      valor: formatadorMoeda.format(0),
-      detalhe: 'Seu saldo esta equilibrado com as despesas do grupo.',
+      valor: formatarMoeda(0),
       destaque: styles.neutroValor,
     };
   }, [saldoDoUsuario]);
@@ -278,7 +260,7 @@ export default function ExtratoScreen() {
             <Text style={styles.descricao} numberOfLines={1}>
               {grupoSelecionado?.nome ?? 'Grupo'}
             </Text>
-            <Text style={styles.valor}>{formatadorMoeda.format(Number(item.valor_total))}</Text>
+            <Text style={styles.valor}>{formatarMoeda(Number(item.valor_total))}</Text>
           </View>
 
           <Text style={styles.subdescricao} numberOfLines={1}>
@@ -287,7 +269,7 @@ export default function ExtratoScreen() {
           <Text style={styles.meta} numberOfLines={1}>
             Pago por {nomePagador}
           </Text>
-          <Text style={styles.data}>{formatadorData.format(new Date(item.criado_em))}</Text>
+          <Text style={styles.data}>{formatarData(item.criado_em)}</Text>
 
           {item.recibo_url ? (
             <TouchableOpacity style={styles.reciboBotao} onPress={() => abrirTelaDoGrupo(item.grupo_id)}>
@@ -373,9 +355,9 @@ export default function ExtratoScreen() {
             <View style={styles.resumo}>
               <View>
                 <Text style={styles.resumoLabel}>TOTAL DO GRUPO</Text>
-                <Text style={styles.resumoValor}>{formatadorMoeda.format(total)}</Text>
+                <Text style={styles.resumoValor}>{formatarMoeda(total)}</Text>
                 <Text style={styles.resumoAuxiliar}>
-                  Valor total que esta pendente neste grupo: {formatadorMoeda.format(totalDevidoGrupo)}
+                  Valor total que esta pendente neste grupo: {formatarMoeda(totalDevidoGrupo)}
                 </Text>
               </View>
             </View>
@@ -385,8 +367,8 @@ export default function ExtratoScreen() {
                 <Text style={styles.kpiLabel}>Maior despesa</Text>
                 <Text style={styles.kpiValueCompact}>
                   {maiorDespesa
-                    ? formatadorMoeda.format(Number(maiorDespesa.valor_total))
-                    : formatadorMoeda.format(0)}
+                    ? formatarMoeda(Number(maiorDespesa.valor_total))
+                    : formatarMoeda(0)}
                 </Text>
                 <Text style={styles.kpiAuxiliar} numberOfLines={1}>
                   {maiorDespesa?.descricao ?? 'Sem despesas ainda'}
@@ -396,8 +378,8 @@ export default function ExtratoScreen() {
                 <Text style={styles.kpiLabel}>Total por pagador</Text>
                 <Text style={styles.kpiValueCompact}>
                   {totaisPorPagador[0]
-                    ? formatadorMoeda.format(totaisPorPagador[0].total)
-                    : formatadorMoeda.format(0)}
+                    ? formatarMoeda(totaisPorPagador[0].total)
+                    : formatarMoeda(0)}
                 </Text>
                 <Text style={styles.kpiAuxiliar} numberOfLines={1}>
                   {totaisPorPagador[0]?.nome ?? 'Sem pagadores ainda'}
@@ -410,7 +392,6 @@ export default function ExtratoScreen() {
               <Text style={[styles.blocoValorGrande, textoSaldoUsuario.destaque]}>
                 {textoSaldoUsuario.valor}
               </Text>
-              <Text style={styles.blocoAuxiliar}>{textoSaldoUsuario.detalhe}</Text>
             </View>
 
             {erro ? (
@@ -471,12 +452,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#C7DA97',
     borderColor: '#597317',
-    borderRadius: 999,
+    borderRadius: 0,
     borderWidth: 1,
-    flexDirection: 'row',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    justifyContent: 'center',
+    minHeight: 64,
+    minWidth: 108,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
   grupoChipAtivo: {
     backgroundColor: '#597317',
@@ -486,6 +468,7 @@ const styles = StyleSheet.create({
     color: '#4F5F2B',
     fontSize: 13,
     fontWeight: '600',
+    textAlign: 'center',
   },
   grupoChipTextoAtivo: {
     color: '#EAF3D1',
@@ -493,7 +476,7 @@ const styles = StyleSheet.create({
   resumo: {
     backgroundColor: '#D7E8AE',
     borderColor: '#597317',
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
     marginHorizontal: 20,
     marginBottom: 12,
@@ -511,7 +494,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D7E8AE',
     borderColor: '#597317',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 0,
     padding: 12,
   },
   kpiLabel: {
@@ -524,13 +507,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginTop: 4,
   },
+  kpiValueCompact: {
+    color: '#303329',
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: 6,
+  },
+  kpiAuxiliar: {
+    color: '#4F5F2B',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 6,
+  },
   dashboardBloco: {
     marginHorizontal: 20,
     marginBottom: 10,
     backgroundColor: '#D7E8AE',
     borderColor: '#597317',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 0,
     padding: 12,
   },
   blocoTitulo: {
@@ -642,7 +637,7 @@ const styles = StyleSheet.create({
   contador: {
     alignItems: 'center',
     backgroundColor: '#E7F4ED',
-    borderRadius: 8,
+    borderRadius: 0,
     flexDirection: 'row',
     gap: 6,
     paddingHorizontal: 10,
@@ -672,7 +667,7 @@ const styles = StyleSheet.create({
   item: {
     backgroundColor: '#D7E8AE',
     borderColor: '#597317',
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
     flexDirection: 'row',
     marginHorizontal: 20,
@@ -683,19 +678,19 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   avatar: {
-    borderRadius: 22,
+    borderRadius: 0,
     height: 44,
     width: 44,
   },
   avatarPequeno: {
-    borderRadius: 16,
+    borderRadius: 0,
     height: 32,
     width: 32,
   },
   avatarPlaceholder: {
     alignItems: 'center',
     backgroundColor: '#B9CF82',
-    borderRadius: 22,
+    borderRadius: 0,
     height: 44,
     justifyContent: 'center',
     width: 44,
@@ -703,7 +698,7 @@ const styles = StyleSheet.create({
   avatarPlaceholderPequeno: {
     alignItems: 'center',
     backgroundColor: '#B9CF82',
-    borderRadius: 16,
+    borderRadius: 0,
     height: 32,
     justifyContent: 'center',
     width: 32,
@@ -777,7 +772,7 @@ const styles = StyleSheet.create({
   erroBox: {
     backgroundColor: '#D7E8AE',
     borderColor: '#597317',
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
     marginHorizontal: 20,
     marginBottom: 12,

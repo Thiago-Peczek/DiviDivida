@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Grupo } from "@/types/database";
-import { enviarImagemGrupo } from "./storageService";
 import { adicionarMembro } from "./membroService";
+import { enviarImagemGrupo } from "./storageService";
 
 export async function criarGrupo(
   nome: string,
@@ -9,8 +9,10 @@ export async function criarGrupo(
   latitude?: number | null,
   longitude?: number | null,
   encontroNome?: string | null,
-  imagemGrupoUrl?: string | null,
+  imagemGrupoUri?: string | null,
 ): Promise<Grupo> {
+  console.log("CRIANDO GRUPO");
+  const codigoConvite = gerarCodigoConvite();
   const { data: grupo, error: erroGrupo } = await supabase
     .from("grupos")
     .insert({
@@ -19,42 +21,43 @@ export async function criarGrupo(
       encontro_latitude: latitude ?? null,
       encontro_longitude: longitude ?? null,
       encontro_nome: encontroNome ?? null,
-      codigo_convite: gerarCodigoConvite(),
+      codigo_convite: codigoConvite,
+      imagem_grupo_url: null,
     })
     .select()
     .single();
 
   if (erroGrupo) throw erroGrupo;
 
-  let imagemUrl: string | null = null;
+  console.log("RESULTADO GRUPO:", grupo, erroGrupo);
+  console.log("ADICIONANDO CRIADOR COMO MEMBRO");
 
-  // 2 - upload imagem
-  if (imagemGrupoUrl) {
-    imagemUrl = await enviarImagemGrupo(grupo.id, imagemGrupoUrl);
-
-    // 3 - atualiza grupo com url
-    const { error: erroImagem } = await supabase
-      .from("grupos")
-      .update({
-        imagem_grupo_url: imagemUrl,
-      })
-      .eq("id", grupo.id);
-
-    if (erroImagem) throw erroImagem;
-  }
-
-  // atualiza objeto local
-  grupo.imagem_grupo_url = imagemUrl;
-
-  // 4 - adiciona criador como membro
   const { error: erroMembro } = await supabase.from("membros_grupo").insert({
     grupo_id: grupo.id,
     usuario_id: criadorId,
+    ativo: true,
   });
 
   if (erroMembro) throw erroMembro;
 
-  return grupo as Grupo;
+  if (!imagemGrupoUri) {
+    return grupo as Grupo;
+  }
+
+  const imagemUrl = await enviarImagemGrupo(grupo.id, imagemGrupoUri);
+  console.log("ATUALIZANDO IMAGEM DO GRUPO");
+  const { data: grupoAtualizado, error: erroImagem } = await supabase
+    .from("grupos")
+    .update({
+      imagem_grupo_url: imagemUrl,
+    })
+    .eq("id", grupo.id)
+    .select()
+    .single();
+
+  if (erroImagem) throw erroImagem;
+
+  return grupoAtualizado as Grupo;
 }
 
 function gerarCodigoConvite() {
@@ -114,9 +117,22 @@ export async function atualizarGrupo(
 }
 
 export async function excluirGrupo(grupoId: string): Promise<void> {
-  const { error } = await supabase.from("grupos").delete().eq("id", grupoId);
+  const { data, error } = await supabase
+    .from("grupos")
+    .delete()
+    .eq("id", grupoId)
+    .select("id");
 
-  if (error) throw error;
+  if (error) {
+    console.error("Erro ao excluir grupo:", error);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error(
+      "O grupo não foi excluído. Verifique a permissão RLS e se você é o criador.",
+    );
+  }
 }
 
 export async function entrarGrupo(codigo: string, usuarioId: string) {

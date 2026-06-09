@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -7,24 +8,42 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { router } from "expo-router";
 
-import { entrarGrupoPorCodigo } from "@/services/membroService";
 import { useAuth } from "@/contexts/AuthContext";
+import { entrarGrupoPorCodigo } from "@/services/membroService";
 
 export default function JoinGroupScreen() {
   const [codigo, setCodigo] = useState("");
-  const { userId } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleJoin = async () => {
+    const codigoNormalizado = codigo.trim().toUpperCase();
+
+    if (!codigoNormalizado) {
+      Alert.alert("Erro", "Informe o código do grupo");
+      return;
+    }
+
     try {
-      await entrarGrupoPorCodigo(codigo.trim().toUpperCase(), userId!);
+      setLoading(true);
+
+      const grupoId = await entrarGrupoPorCodigo(codigoNormalizado);
 
       Alert.alert("Sucesso", "Você entrou no grupo");
 
-      router.replace("/(tabs)/grupos" as any);
+      router.replace({
+        pathname: "/grupo/[id]",
+        params: { id: grupoId },
+      });
     } catch (err: any) {
-      Alert.alert("Erro", err.message || "Código inválido");
+      console.error("Erro ao entrar no grupo:", err);
+
+      Alert.alert(
+        "Erro",
+        err.message || "Código inválido ou grupo não encontrado",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 

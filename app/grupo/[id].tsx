@@ -1,7 +1,9 @@
+import MapWrapper from "@/components/MapWrapper";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   Share,
@@ -10,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapWrapper from "@/components/MapWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AddExpenseModal from "@/components/AddExpenseModal";
@@ -110,25 +111,34 @@ export default function GroupScreen() {
 
   const handleInvite = async () => {
     if (!group) return;
-    try {
-      await Share.share({
-        message: `Entre no meu grupo no DiviDívida!
 
-Código do grupo:
-${group.codigo_convite}`,
-      });
-    } catch (error) {
-      console.error(error);
+    if (!group.codigo_convite) {
+      Alert.alert("Erro", "Este grupo não possui um código de convite.");
+      return;
     }
+
+    await Share.share({
+      message: `Entre no meu grupo no DiviDívida!
+
+Nome do grupo: ${group.nome}
+
+Código do grupo: ${group.codigo_convite}`,
+    });
   };
 
-  const handleRemoveMember = async (memberId: string) => {
+  const handleRemoveMember = async (usuarioId: string) => {
+    if (!id) return;
+
     try {
-      await removerMembro(id, memberId);
+      await removerMembro(id, usuarioId);
 
       await carregarMembros();
-    } catch (err) {
-      console.error(err);
+
+      Alert.alert("Sucesso", "Membro removido do grupo");
+    } catch (err: any) {
+      console.error("Erro ao remover membro:", err);
+
+      Alert.alert("Erro", err.message || "Não foi possível remover o membro");
     }
   };
 
@@ -136,9 +146,13 @@ ${group.codigo_convite}`,
     try {
       await excluirGrupo(id);
 
-      router.back();
-    } catch (err) {
-      console.error(err);
+      setMenuVisible(false);
+
+      router.replace("/(tabs)/grupos");
+    } catch (err: any) {
+      console.error("Erro completo:", err);
+
+      Alert.alert("Erro", err.message || "Não foi possível apagar o grupo");
     }
   };
 
@@ -243,15 +257,17 @@ ${group.codigo_convite}`,
         keyExtractor={(item) => item.id}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        renderItem={({ item }) => (
-          <ExpenseCard
-            descricao={item.descricao}
-            valor={Number(item.valor_total)}
-            nomePagador={item.pagador.nome}
-            avatarPagador={item.pagador.imagem_url}
-            recibo={item.recibo_url}
-          />
-        )}
+        renderItem={({ item }) => {
+          return (
+            <ExpenseCard
+              descricao={item.descricao}
+              valor={Number(item.valor_total)}
+              nomePagador={item.pagador?.nome ?? "Usuário não encontrado"}
+              avatarPagador={item.pagador?.imagem_url ?? null}
+              recibo={item.recibo_url}
+            />
+          );
+        }}
         ListEmptyComponent={
           <Text style={styles.empty}>Nenhuma despesa cadastrada</Text>
         }

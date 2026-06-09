@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import type { Despesa, Usuario } from "@/types/database";
 
 export type DespesaComPagador = Despesa & {
-  pagador: Usuario;
+  pagador: Usuario | null;
 };
 
 export async function criarDespesa(

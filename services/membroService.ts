@@ -9,15 +9,30 @@ export async function adicionarMembro(
   grupoId: string,
   usuarioId: string,
 ): Promise<MembroGrupo> {
-  const { data: existente } = await supabase
+  const { data: membroExistente, error: erroBusca } = await supabase
     .from("membros_grupo")
-    .select("usuario_id")
+    .select("*")
     .eq("grupo_id", grupoId)
     .eq("usuario_id", usuarioId)
     .maybeSingle();
 
-  if (existente) {
-    throw new Error("Usuário já está no grupo");
+  if (erroBusca) throw erroBusca;
+
+  if (membroExistente) {
+    const { data, error } = await supabase
+      .from("membros_grupo")
+      .update({
+        ativo: true,
+        removido_em: null,
+      })
+      .eq("grupo_id", grupoId)
+      .eq("usuario_id", usuarioId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data as MembroGrupo;
   }
 
   const { data, error } = await supabase
@@ -25,6 +40,7 @@ export async function adicionarMembro(
     .insert({
       grupo_id: grupoId,
       usuario_id: usuarioId,
+      ativo: true,
     })
     .select()
     .single();
@@ -48,24 +64,38 @@ export async function removerMembro(
   grupoId: string,
   usuarioId: string,
 ): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("membros_grupo")
-    .delete()
+    .update({
+      ativo: false,
+      removido_em: new Date().toISOString(),
+    })
     .eq("grupo_id", grupoId)
-    .eq("usuario_id", usuarioId);
+    .eq("usuario_id", usuarioId)
+    .select("grupo_id, usuario_id");
 
-  if (error) throw error;
+  if (error) {
+    console.error("Erro ao remover membro:", error);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error(
+      "O membro não foi removido. Verifique sua permissão de administrador.",
+    );
+  }
 }
-
 export async function listarMembros(
   grupoId: string,
 ): Promise<MembroComPerfil[]> {
   const { data, error } = await supabase
     .from("membros_grupo")
     .select("*, usuario:usuarios(*)")
-    .eq("grupo_id", grupoId);
+    .eq("grupo_id", grupoId)
+    .eq("ativo", true);
 
   if (error) throw error;
+
   return (data ?? []) as unknown as MembroComPerfil[];
 }
 
@@ -97,14 +127,18 @@ export async function buscarUsuarioPorEmail(
   return data as Usuario | null;
 }
 
-export async function entrarGrupoPorCodigo(codigo: string, usuarioId: string) {
-  const { data: grupo, error } = await supabase
-    .from("grupos")
-    .select("id")
-    .eq("codigo_convite", codigo)
-    .single();
+export async function entrarGrupoPorCodigo(codigo: string): Promise<string> {
+  const codigoNormalizado = codigo.trim().toUpperCase();
+
+  const { data, error } = await supabase.rpc("entrar_em_grupo_por_codigo", {
+    p_codigo: codigoNormalizado,
+  });
 
   if (error) throw error;
 
-  return adicionarMembro(grupo.id, usuarioId);
+  if (!data) {
+    throw new Error("Não foi possível entrar no grupo");
+  }
+
+  return data as string;
 }

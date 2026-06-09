@@ -80,13 +80,13 @@ export default function GroupMenuModal({
                   onPress={() =>
                     Alert.alert(
                       "Remover membro",
-                      `Remover ${member.usuario.nome} do grupo?`,
+                      `Deseja remover ${member.usuario.nome} do grupo?`,
                       [
                         { text: "Cancelar", style: "cancel" },
                         {
                           text: "Remover",
                           style: "destructive",
-                          onPress: () => onRemoveMember(member.usuario.id),
+                          onPress: () => onRemoveMember(member.usuario_id),
                         },
                       ],
                     )

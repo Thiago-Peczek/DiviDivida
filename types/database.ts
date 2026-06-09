@@ -20,6 +20,8 @@ export type Grupo = {
 export type MembroGrupo = {
   grupo_id: string;
   usuario_id: string;
+  ativo: boolean;
+  removido_em: string | null;
   criado_em: string;
 };
 

@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 
-// imports serviços
 import { entrarGrupoPorCodigo } from "@/services/membroService";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -23,7 +22,7 @@ export default function JoinGroupScreen() {
 
       Alert.alert("Sucesso", "Você entrou no grupo");
 
-      router.replace("/(tabs)/groups");
+      router.replace("/(tabs)/grupos" as any);
     } catch (err: any) {
       Alert.alert("Erro", err.message || "Código inválido");
     }

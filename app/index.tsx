@@ -21,7 +21,7 @@ export default function Index() {
   }
 
   if (isLogged) {
-    return <Redirect href="/(tabs)/groups" />;
+    return <Redirect href={"/(tabs)/grupos" as any} />;
   }
 
   return <Redirect href="/(auth)/login" />;

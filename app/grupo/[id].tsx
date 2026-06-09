@@ -1,4 +1,3 @@
-//imports dependências
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -11,21 +10,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapWrapper from "@/components/MapWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-//imports componentes
 import AddExpenseModal from "@/components/AddExpenseModal";
 
-//imports serviços
 import { excluirGrupo, obterGrupo } from "@/services/grupoService";
 import { listarMembros, removerMembro } from "@/services/membroService";
 
-//imports tipos
 import type { MembroComPerfil } from "@/services/membroService";
 import type { Grupo } from "@/types/database";
 
-//imports ícones
 import ExpenseCard from "@/components/ExpenseCard";
 import GroupMenuModal from "@/components/GroupMenuModal";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,7 +48,7 @@ export default function GroupScreen() {
   const { userId } = useAuth();
   const isCreator = group?.criado_por_usuario_id === userId;
 
-  const mapRef = useRef<MapView | null>(null);
+  const mapRef = useRef<any>(null);
   useEffect(() => {
     carregarTudo();
   }, [id]);
@@ -147,9 +142,9 @@ ${group.codigo_convite}`,
     }
   };
 
-  const latitude = group?.encontro_latitude ?? -25.4295963;
+  const latitude = group?.encontro_latitude ?? -25.4633;
 
-  const longitude = group?.encontro_longitude ?? -49.2712724;
+  const longitude = group?.encontro_longitude ?? -49.2353;
 
   const initialRegion = useMemo(
     () => ({
@@ -215,22 +210,14 @@ ${group.codigo_convite}`,
             }
           }}
         >
-          <MapView
-            scrollEnabled={mapExpanded}
-            zoomEnabled={mapExpanded}
-            rotateEnabled={mapExpanded}
-            pitchEnabled={mapExpanded}
-            style={[styles.map, mapExpanded && styles.mapExpanded]}
-            ref={mapRef}
+          <MapWrapper
+            mapRef={mapRef}
+            mapExpanded={mapExpanded}
             initialRegion={initialRegion}
-          >
-            <Marker
-              coordinate={{
-                latitude: group.encontro_latitude ?? -25.4295963,
-                longitude: group.encontro_longitude ?? -49.2712724,
-              }}
-            />
-          </MapView>
+            latitude={group.encontro_latitude ?? -25.4633}
+            longitude={group.encontro_longitude ?? -49.2353}
+            style={[styles.map, mapExpanded && styles.mapExpanded]}
+          />
 
           {!mapExpanded && (
             <Text style={styles.location}>

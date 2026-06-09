@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { MapPressEvent, Marker } from "react-native-maps";
+import CreateGroupMap from "@/components/CreateGroupMap";
 
 export default function CreateGroupScreen() {
   const [nome, setNome] = useState("");
@@ -46,7 +46,7 @@ export default function CreateGroupScreen() {
     }
   };
 
-  const selecionarLocal = (event: MapPressEvent) => {
+  const selecionarLocal = (event: any) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
 
     setLatitude(latitude);
@@ -105,25 +105,12 @@ export default function CreateGroupScreen() {
         onChangeText={setLocationName}
       />
       <View style={styles.mapContainer}>
-        <MapView
+        <CreateGroupMap
           style={styles.map}
           onPress={selecionarLocal}
-          initialRegion={{
-            latitude: -25.4295963,
-            longitude: -49.2712724,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          }}
-        >
-          {latitude !== null && longitude !== null && (
-            <Marker
-              coordinate={{
-                latitude,
-                longitude,
-              }}
-            />
-          )}
-        </MapView>
+          latitude={latitude}
+          longitude={longitude}
+        />
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleCriarGrupo}>

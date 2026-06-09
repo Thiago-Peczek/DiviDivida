@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface CreateGroupMapProps {
@@ -26,6 +26,8 @@ export default function CreateGroupMap({
     });
   };
 
+  const possuiLocalSelecionado = latitude !== null && longitude !== null;
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -34,11 +36,11 @@ export default function CreateGroupMap({
     >
       <Ionicons name="map-outline" size={40} color="#303329" />
       <Text style={styles.webMapText}>
-        {latitude && longitude
-          ? "Localização Selecionada (Web)"
-          : "Clique aqui para simular a seleção de local"}
+        {possuiLocalSelecionado
+          ? "Localizacao selecionada (Web)"
+          : "Clique aqui para simular a selecao de local"}
       </Text>
-      {latitude && longitude ? (
+      {possuiLocalSelecionado ? (
         <Text style={styles.webMapCoords}>
           Lat: {latitude.toFixed(4)}, Lng: {longitude.toFixed(4)}
         </Text>

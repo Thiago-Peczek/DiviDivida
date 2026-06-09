@@ -4,12 +4,15 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function Cadastro() {
@@ -27,7 +30,7 @@ export default function Cadastro() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
-      setError("Permissão para acessar a galeria é necessária");
+      setError("Permissao para acessar a galeria e necessaria");
       return;
     }
 
@@ -54,7 +57,7 @@ export default function Cadastro() {
       setError("");
 
       await register(name, email, password, image || undefined);
-      router.push("/login");
+      router.replace("/(auth)/login");
     } catch (err: any) {
       setError(err.message || "Erro ao cadastrar");
     } finally {
@@ -63,74 +66,92 @@ export default function Cadastro() {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../../assets/DiviDivida.png")}
-        style={styles.logo}
-      />
-      <Image
-        source={require("../../assets/DiviDividaLogo.png")}
-        style={styles.logoText}
-      />
-      <Text style={styles.title}>Cadastro</Text>
-
-      <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
-        {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
-        ) : (
-          <Text style={styles.imageText}>Selecionar imagem</Text>
-        )}
-      </TouchableOpacity>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleRegister}
-        disabled={loading}
+    <KeyboardAvoidingView
+      style={styles.keyboardContainer}
+      behavior="height"
+    >
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        )}
-      </TouchableOpacity>
+        <View style={styles.container}>
+          <Image
+            source={require("../../assets/DiviDivida.png")}
+            style={styles.logo}
+          />
+          <Image
+            source={require("../../assets/DiviDividaLogo.png")}
+            style={styles.logoText}
+          />
+          <Text style={styles.title}>Cadastro</Text>
 
-      <TouchableOpacity onPress={() => router.push("/login")}>
-        <Text style={styles.link}>Já tem conta? Entrar</Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.image} />
+            ) : (
+              <Text style={styles.imageText}>Selecionar imagem</Text>
+            )}
+          </TouchableOpacity>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={name}
+            onChangeText={setName}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+            <Text style={styles.link}>Ja tem conta? Entrar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardContainer: {
+    flex: 1,
+    backgroundColor: "#a3c267",
+  },
+  scroll: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    paddingTop: 60,
     padding: 20,
     backgroundColor: "#a3c267",
   },

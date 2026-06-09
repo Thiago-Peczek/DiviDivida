@@ -63,7 +63,7 @@ export default function CreateGroupScreen() {
         return;
       }
 
-      if (!latitude || !longitude) {
+      if (latitude === null || longitude === null) {
         Alert.alert("Erro", "Selecione um local no mapa");
         return;
       }
@@ -254,7 +254,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
   },
-
   button: {
     backgroundColor: "#597317",
     padding: 16,

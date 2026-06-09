@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -24,6 +25,7 @@ export default function GroupsScreen() {
 
   const [groups, setGroups] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -37,14 +39,19 @@ export default function GroupsScreen() {
     }, [userId]),
   );
 
-  const carregarGrupos = async () => {
+  const carregarGrupos = async (modoRefresh = false) => {
     try {
       if (!userId) {
         setLoading(false);
+        setRefreshing(false);
         return;
       }
 
-      setLoading(true);
+      if (modoRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
 
       const data = await listarMeusGrupos(userId);
 
@@ -53,6 +60,7 @@ export default function GroupsScreen() {
       console.log("ERRO:", err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -78,6 +86,14 @@ export default function GroupsScreen() {
         data={groups}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => carregarGrupos(true)}
+            colors={["#597317"]}
+            tintColor="#597317"
+          />
+        }
         renderItem={({ item }) => (
           <GroupCard
             nome={item.nome}

@@ -35,9 +35,6 @@ export default function ExpenseModal({
   const [valor, setValor] = useState("");
 
   const [imagem, setImagem] = useState<string | null>(null);
-
-  const [loading, setLoading] = useState(false);
-
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const { userId } = useAuth();
@@ -75,8 +72,6 @@ export default function ExpenseModal({
 
       console.log("DESPESA CRIADA");
 
-      Alert.alert("Sucesso", "Despesa criada com sucesso");
-
       setDescricao("");
       setValor("");
       setImagem(null);
@@ -112,7 +107,11 @@ export default function ExpenseModal({
             onChangeText={setValor}
           />
 
-          <TouchableOpacity style={styles.imageButton} onPress={escolherImagem}>
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={escolherImagem}
+            disabled={saving}
+          >
             {imagem ? (
               <Image source={{ uri: imagem }} style={styles.preview} />
             ) : (
@@ -123,20 +122,36 @@ export default function ExpenseModal({
           <TouchableOpacity
             style={styles.button}
             onPress={handleCreateExpense}
-            disabled={loading}
+            disabled={saving}
           >
-            {loading ? (
+            {saving ? (
               <ActivityIndicator color="#303329" />
             ) : (
               <Text style={styles.buttonText}>Salvar</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={onClose}
+            disabled={saving}
+          >
             <Text style={styles.cancelText}>Cancelar</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal visible={saving} transparent animationType="fade">
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color="#597317" />
+            <Text style={styles.loadingTitle}>Criando despesa...</Text>
+            <Text style={styles.loadingText}>
+              Aguarde enquanto salvamos sua despesa e guardamos o recibo...
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 }
@@ -146,6 +161,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  loadingOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(48, 51, 41, 0.35)",
+    padding: 24,
+  },
+  loadingCard: {
+    width: "100%",
+    maxWidth: 320,
+    backgroundColor: "#d6e6b3",
+    borderWidth: 1,
+    borderColor: "#597317",
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    alignItems: "center",
+  },
+  loadingTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#303329",
+    marginTop: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#35401A",
+    textAlign: "center",
+    lineHeight: 20,
+    marginTop: 8,
   },
   container: {
     backgroundColor: "#a3c267",
